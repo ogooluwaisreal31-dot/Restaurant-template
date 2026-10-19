@@ -1,4 +1,10 @@
 (() => {
+  // Local dashboard previews are only available in the same browser. Live public updates
+  // require replacing config.js in the repository and publishing a new GitHub Pages build.
+  try {
+    const saved = localStorage.getItem('restaurantAdminPreview');
+    if (saved) window.RESTAURANT_CONFIG = JSON.parse(saved);
+  } catch (error) { console.warn('Could not load local restaurant preview.', error); }
   const c = window.RESTAURANT_CONFIG || {};
   const $ = (selector) => document.querySelector(selector);
   const setText = (selector, value) => { const el = $(selector); if (el && value) el.textContent = value; };
@@ -29,7 +35,7 @@
   if (mapLink) mapLink.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.mapQuery || c.address || "")}`;
 
   const menuGrid = $("#menu-grid");
-  (c.menu || []).forEach(item => {
+  (menuGrid ? (c.menu || []) : []).forEach(item => {
     const card = document.createElement("article"); card.className = "dish-card";
     const img = document.createElement("img"); img.className = "dish-image"; img.src = item.image || ""; img.alt = item.name || "Menu item"; img.loading = "lazy";
     const info = document.createElement("div"); info.className = "dish-info";
@@ -42,7 +48,7 @@
   });
 
   const gallery = $("#gallery-grid");
-  (c.gallery || []).forEach((url, i) => {
+  (gallery ? (c.gallery || []) : []).forEach((url, i) => {
     const img = document.createElement("img"); img.src = url; img.alt = `${c.name || "Restaurant"} food gallery photo ${i + 1}`; img.loading = "lazy"; gallery.append(img);
   });
 
